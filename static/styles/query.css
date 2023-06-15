@@ -1,0 +1,26 @@
+.card {
+  margin: 30px;
+}
+
+.form-inline.card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-inline.card-text .input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-inline.card-text .input-group .input-group-addon {
+  margin-bottom: 5px;
+}
+
+.form-inline.card-text .form-group:last-child {
+  margin-top: 10px;
+}
+
+.selectpicker{
+  width: 100% !important;
+}

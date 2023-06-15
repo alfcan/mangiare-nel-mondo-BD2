@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Risultati - Ristoranti</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/card.css')}}">
+{% endblock %}
+
+{% block body %}
+
+<h6 class="result-count">Risultati della ricerca: {{result_count}}</h6>
+<div class="container container-card">
+    <div class="row">
+        <div id="carouselExample" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                {% set restaurant_list = restaurants|batch(9) %}
+                {% for batch in restaurant_list %}
+                {% set batch_index = loop.index0 %}
+                <div class="carousel-item {% if loop.index == 1 %}active{% endif %}">
+                    <div class="row">
+                        {% for restaurant in batch %}
+                        <div class="col-lg-4 col-md-6 col-sm-12 d-flex mb-4 mt-4">
+                            <div class="card card-margin flex-column h-100 w-100">
+                                <div class="card-header no-border">
+                                    <h5 class="card-title">{{restaurant.restaurant_name}}</h5>
+                                </div>
+                                <div class="card-body pt-0">
+                                    <div class="widget-49">
+                                        <div class="widget-49-title-wrapper">
+                                            <div class="widget-49-meeting-info">
+
+                                                <span class="widget-49-pro-title">Città: {{restaurant.city}}</span>
+                                                <span class="widget-49-meeting-time">Indirizzo: {{restaurant.address}}</span>
+                                            </div>
+                                        </div>
+                                        <ul class="widget-49-meeting-points">
+                                            {% if restaurant.cuisines %}
+                                            <li class="widget-49-meeting-item"><span>Tipi di cucina: {% for i in range((restaurant.cuisines|length)) %} {%if i==((restaurant.cuisines|length)-1)  %} {{restaurant.cuisines[i]}} {%else%} {{restaurant.cuisines[i] }}, {%endif%} {% endfor %}</span></li>
+                                            {% else %}
+                                            <li class="widget-49-meeting-item"><span>Tipi di cucina: Non specificato</span></li>
+                                            {% endif %}
+                                            {% if restaurant.average_cost_for_two != 0 %}
+                                            <li class="widget-49-meeting-item"><span>Costo medio per due: {{restaurant.average_cost_for_two}}</span></li>
+                                            {% else %}
+                                            <li class="widget-49-meeting-item"><span>Costo medio per due: Non specificato</span></li>
+                                            {% endif %}
+                                            <li class="widget-49-meeting-item"><span>Moneta utilizzata: {{restaurant.currency}}</span></li>
+                                            {% if restaurant.has_table_booking == False %}
+                                            <li class="widget-49-meeting-item"><span>Ha prenotazioni al tavolo: No</span></li>
+                                            {% endif %}
+                                            {% if restaurant.has_table_booking == True %}
+                                            <li class="widget-49-meeting-item"><span>Ha prenotazioni al tavolo: Sì</span></li>
+                                            {% endif %}
+                                            {% if restaurant.has_online_delivery == False %}
+                                            <li class="widget-49-meeting-item"><span>Ha delivery online: No</span></li>
+                                            {% endif %}
+                                             {% if restaurant.has_online_delivery == True %}
+                                            <li class="widget-49-meeting-item"><span>Ha delivery online: Sì</span></li>
+                                            {% endif %}
+                                            <li class="widget-49-meeting-item"><span>Range di prezzo: {{restaurant.price_range}}</span></li>
+                                            <li class="widget-49-meeting-item"><span>Voto medio: {{restaurant.aggregate_rating}}</span></li>
+                                            <li class="widget-49-meeting-item"><span>Voti totali: {{restaurant.votes}}</span></li>
+                                        </ul>
+                                        <div class="widget-49-meeting-action">
+                                            <a href="#" class="btn btn-sm btn-flash-border-primary">Modifica</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="btn-carousel text-center">
+    <a class="btn btn-primary" href="#carouselExample" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="btn btn-primary" href="#carouselExample" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+{% endblock %}

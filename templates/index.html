@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Home - Ristoranti</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/query.css')}}">
+{% endblock %}
+
+{% block body %}
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 1
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per città, in ordine decrescente di punteggio medio</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query1') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona la città</span>
+                  <select name="city" class="selectpicker form-control">
+                    {% for c in city %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 2
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti con prenotazione al tavolo, in ordine decrescente di numero di voti totali</h5>
+    <p class="card-text"></p>
+    <form class="form-inline card-text" method="POST" action="{{ url_for('query2') }}">
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 3
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti con prezzo medio per due persone minore di un prezzo indicato, aventi come valuta i dollari</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query3') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona il prezzo massimo</span>
+                  <input type="number" name="prezzo"/>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 4
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per tipi di cucina</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query4') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona i tipi di cucina</span>
+                  <select name="cuisine[]" class="selectpicker form-control" multiple="multiple">
+                    {% for c in cuisines %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 5
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per città, punteggio minimo e che effettuano consegna online</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query5') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona la città</span>
+                  <select name="city" class="selectpicker form-control">
+                    {% for c in city %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+            <span class="input-group-addon">Seleziona il punteggio minimo</span>
+                  <input type="number" name="punteggio" step="0.1" min="0" max="5" pattern="^\d(\.\d)?$" required>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 6
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per città, prezzo per due massimo e con prenotazione al tavolo</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query6') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona la città</span>
+                  <select name="city" class="selectpicker form-control">
+                    {% for c in city %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+            <span class="input-group-addon">Seleziona il prezzo per due massimo</span>
+                  <input type="number" name="prezzo"/>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 7
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per totale voti minimo e voto medio minimo, ordinati per voto medio</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query7') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona il totale voti minimo</span>
+                  <input type="number" name="voti"/>
+            <span class="input-group-addon">Seleziona il voto medio minimo</span>
+                  <input type="number" name="punteggio" step="0.1" min="0" max="5" pattern="^\d(\.\d)?$" required>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 8
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per nome</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query8') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Inserisci il nome</span>
+                  <input type="text" name="nome"/>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 9
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova i ristoranti per tipo di cucina, voto medio minimo, con prenotazione al tavolo, consegna online, numero di voti >= 100 e range di prezzo</h5>
+      <form class="form-inline card-text" method="POST" action="{{ url_for('query9') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona il tipo di cucina</span>
+                <select name="cuisine[]" class="selectpicker form-control" multiple="multiple">
+                  {% for c in cuisines %}
+                  <option value="{{ c }}">{{ c }}</option>
+                  {% endfor %}
+                </select>
+            <span class="input-group-addon">Seleziona il voto medio minimo</span>
+                  <input type="number" name="punteggio" step="0.1" min="0" max="5" pattern="^\d(\.\d)?$" required>
+            <span class="input-group-addon">Seleziona il range di prezzo</span>
+                  <input type="number" name="range_prezzo" min="1" max="4" pattern="^\d(\.\d)?$" required>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra ristoranti</button>
+      </form>
+  </div>
+</div>
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 10
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova il numero di voti medio per i ristoranti di una determinata città</h5>
+     <form class="form-inline card-text" method="POST" action="{{ url_for('query10') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona la città</span>
+                  <select name="city" class="selectpicker form-control">
+                    {% for c in city %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra risultato</button>
+      </form>
+  </div>
+  {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for i in messages %}
+          <script>
+              alert("{{ i }}");
+          </script>
+          {% endfor %}
+      {% endif %}
+  {% endwith %}
+</div>
+{% endblock %}

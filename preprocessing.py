@@ -1,5 +1,6 @@
 import pandas as pd
 import chardet
+from forex_python.converter import CurrencyRates
 
 
 def delete_cols(df, cols):
@@ -13,6 +14,7 @@ def replace_bool(df, cols):
         df[col] = df[col].replace({"Yes": True, "No": False})
 
     return df
+
 
 def delete_not_utf(df, cols):
     for col in cols:
@@ -29,25 +31,24 @@ if __name__ == '__main__':
 
     df = pd.read_csv("zomato.csv", encoding=encoding)
 
-
-#Eliminiamo colonne non rilevanti per ridurre le dimensioni del dataset
+    # Eliminiamo colonne non rilevanti per ridurre le dimensioni del dataset
     df = delete_cols(df, cols=["Country Code", "Locality Verbose", "Longitude", "Latitude",
                                "Is delivering now", "Switch to order menu", "Rating color", "Rating text"])
 
-#Rendiamo le colonne "Has Table booking" e "Has Online delivery" da string a booleane
+    # Rendiamo le colonne "Has Table booking" e "Has Online delivery" da string a booleane
     df = replace_bool(df, cols=["Has Table booking", "Has Online delivery"])
 
-#Normalizziamo il formato dei nomi delle colonne
+    # Normalizziamo il formato dei nomi delle colonne
     df = df.rename(columns=lambda x: x.lower().replace(' ', '_'))
 
-#Eliminiamo le righe aventi caratteri con codifica non leggibile
-    print("SHAPE BEFORE", df.shape[0])
-
+    # Eliminiamo le righe aventi caratteri con codifica non leggibile
     df = delete_not_utf(df, cols=["restaurant_name", "city", "address", "locality"])
 
-    print("SHAPE AFTER", df.shape[0])
+    # Trasformiamo la colonna "cuisines" in un array di stringhe
+    df['cuisines'] = df['cuisines'].str.split(', ')
 
     df.to_csv("dataset.csv", encoding="utf-8", index=False)
+    df.to_json("data.json", orient="records")
 
     print(df.columns)
     print(df.dtypes.to_dict())
