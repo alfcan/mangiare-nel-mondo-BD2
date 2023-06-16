@@ -1,71 +1,71 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<title>Inserimento - Ristoranti</title>
+<title>Modifica - Ristoranti</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/insert.css')}}">
 {% endblock %}
 
 {% block body %}
+
 <div class="form-insert">
-    <form method="POST" action="{{ url_for('add_restaurant') }}">
+    <form method="POST" action="{{ url_for('modify_restaurant') }}">
+      <input type="hidden" name="_id" value="{{ restaurant._id }}">
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Nome</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control-plaintext" name="nome" required placeholder="Pizzeria Italia">
+          <input type="text" class="form-control-plaintext" name="nome" value="{{ restaurant.restaurant_name }}">
         </div>
       </div>
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Città</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control-plaintext" name="city" required placeholder="Roma">
+          <input type="text" class="form-control-plaintext" name="city" value="{{ restaurant.city }}">
         </div>
       </div>
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Indirizzo</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control-plaintext" name="address" required placeholder="Via Napoli 12, Roma">
+          <input type="text" class="form-control-plaintext" name="address" value="{{ restaurant.address }}">
         </div>
       </div>
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Tipi di cucina</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control-plaintext" name="cuisines" placeholder="Pizza, Sushi, ...">
+          <input type="text" class="form-control-plaintext" name="cuisines" value="{{ cuisines }}">
         </div>
       </div>
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Costo medio per due</label>
         <div class="col-sm-10">
          <span class="input-group-addon"></span>
-            <input type="number" name="prezzo", placeholder="15"/>
+            <input type="number" name="prezzo" value="{{ restaurant.average_cost_for_two }}"/>
         </div>
       </div>
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Moneta utilizzata</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control-plaintext" name="currency" placeholder="Euro(€)">
+          <input type="text" class="form-control-plaintext" name="currency" value="{% if restaurant.currency is not none %}{{ restaurant.currency }}{% endif %}">
         </div>
       </div>
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">Ha prenotazione al tavolo?</label>
          <div class="radio">
-          <input type="radio" id="NoTable" name="table" value="No" checked>
-          <label for="NoTable">No</label>
+          <input type="radio" id="NoTable" name="table" value="No" {% if not restaurant.has_table_booking %} checked {% endif %}>
+             <label for="NoTable">No</label>
         </div>
         <div class="radio">
-          <input type="radio" id="SìTable" name="table" value="Sì" checked>
+          <input type="radio" id="SìTable" name="table" value="Sì" {% if restaurant.has_table_booking %} checked {% endif %}>
           <label for="SìTable">Sì</label>
         </div>
       </div>
       <div class="form-group row">
         <label  class="col-sm-2 col-form-label">Ha delivery online?</label>
          <div class="radio">
-          <input type="radio" id="NoOnline" name="delivery" value="No"
-                 checked>
+          <input type="radio" id="NoOnline" name="delivery" value="No" {% if not restaurant.has_online_delivery %} checked {% endif %}>
           <label for="NoOnline">No</label>
         </div>
          <div class="radio">
-          <input type="radio" id="SìOnline" name="delivery" value="Sì"
-                 checked>
+          <input type="radio" id="SìOnline" name="delivery" value="Sì" {% if restaurant.has_online_delivery %} checked {% endif %}>
           <label for="SìOnline">Sì</label>
         </div>
       </div>
@@ -73,25 +73,25 @@
           <label  class="col-sm-2 col-form-label">Range di prezzo</label>
           <div class="col-sm-10">
              <span class="input-group-addon"></span>
-                      <input type="number" name="range_prezzo" min="1" max="4" pattern="^\d(\.\d)?$" required>
+                      <input type="number" name="range_prezzo" min="1" max="4" pattern="^\d(\.\d)?$" required value="{{restaurant.price_range}}">
           </div>
       </div>
       <div class="form-group row">
           <label  class="col-sm-2 col-form-label">Voto medio</label>
           <div class="col-sm-10">
              <span class="input-group-addon"></span>
-                      <input type="number" name="punteggio" step="0.1" min="0" max="5" pattern="^\d(\.\d)?$" required>
+                      <input type="number" name="punteggio" step="0.1" min="0" max="5" pattern="^\d(\.\d)?$" required value="{{restaurant.aggregate_rating}}">
           </div>
       </div>
       <div class="form-group row">
           <label  class="col-sm-2 col-form-label">Voti totali</label>
           <div class="col-sm-10">
              <span class="input-group-addon"></span>
-                      <input type="number" name="voti" min="0" required>
+                      <input type="number" name="voti" min="0" required value="{{restaurant.votes}}">
           </div>
       </div>
 
-     <button type="submit" class="btn btn-primary">Inserisci ristorante</button>
+     <button type="submit" class="btn btn-primary">Modifica ristorante</button>
     </form>
 </div>
 

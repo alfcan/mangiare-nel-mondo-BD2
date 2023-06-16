@@ -1,4 +1,7 @@
-from flask import Flask, render_template, request, flash, redirect
+import json
+
+from flask import Flask, render_template, request, flash, url_for
+from bson.objectid import ObjectId
 from pymongo import MongoClient
 
 app = Flask(__name__, template_folder='templates')
@@ -11,15 +14,21 @@ db = client.get_database()
 
 app.secret_key = 'secret_key'
 restaurant_collection = db.ristoranti
-distinct_city = restaurant_collection.distinct('city')
+distinct_city = None
+distinct_cuisines = None
 
-distinct_cuisines = restaurant_collection.distinct('cuisines')
-distinct_cuisines.remove(None)
+
+def update_distinct():
+    distinct_city = restaurant_collection.distinct('city')
+    distinct_cuisines = restaurant_collection.distinct('cuisines')
+
+    if None in distinct_cuisines:
+        distinct_cuisines.remove(None)
+
+    return distinct_city, distinct_cuisines
 
 @app.route('/cards')
 def cards():
-
-    print(restaurant_collection)
     restaurants = restaurant_collection.find()
     result_count = restaurant_collection.count_documents({})
 
@@ -28,6 +37,8 @@ def cards():
 
 @app.route('/')
 def index():
+    distinct_city, distinct_cuisines = update_distinct()
+
     return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
 
 
@@ -70,7 +81,6 @@ def query4():
     result_count = db.ristoranti.count_documents({"$and": query})
 
     return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
-
 
 
 @app.route("/query5", methods=['GET', 'POST'])
@@ -143,15 +153,148 @@ def query10():
     pipeline = [{"$match": {"city": city}}, {"$group": {"_id": "$city", "avg_voti": {"$avg": "$votes"}}}]
 
     return_value = db.ristoranti.aggregate(pipeline)
-    city_popup = ""
-    avg_voti_popup = ""
-    for i in return_value:
-        city_popup = i["_id"]
-        avg_voti_popup = i["avg_voti"]
+    tmp_value=return_value.next()
+    city_popup = tmp_value["_id"]
+    avg_voti_popup = tmp_value["avg_voti"]
 
     flash(f"Per la città: {city_popup}, il numero medio di voti è: {avg_voti_popup}")
 
+    distinct_city, distinct_cuisines = update_distinct()
+
     return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+
+
+@app.route("/modify", methods=['GET', 'POST'])
+def modify():
+    restaurant_id = request.form.get("restaurant_data")
+    restaurant = db.ristoranti.find({"_id": ObjectId(restaurant_id)}).next()
+
+    if restaurant["cuisines"] is not None:
+        cuisines = ", ".join(restaurant["cuisines"])
+    else:
+        cuisines = ""
+
+    return render_template("modify.html", restaurant=restaurant, cuisines=cuisines)
+
+
+@app.route("/delete", methods=['GET', 'POST'])
+def delete():
+    restaurant_id = request.form.get("restaurant_data")
+
+    print(restaurant_id)
+    db.ristoranti.delete_one({"_id": ObjectId(restaurant_id)})
+
+    flash("Ristorante cancellato con successo!")
+
+    distinct_city, distinct_cuisines = update_distinct()
+
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+
+
+@app.route("/insert")
+def insert():
+    return render_template("insert.html")
+
+
+@app.route("/add_restaurant", methods=['GET', 'POST'])
+def add_restaurant():
+    max_id_restaurant = db.ristoranti.find().sort("restaurant_id", -1).limit(1)
+    max_id_obj = max_id_restaurant.next()
+    max_id = int(max_id_obj["restaurant_id"])
+    max_id += 1
+
+    nome = request.form.get("nome")
+    city = request.form.get("city").title()
+    address = request.form.get("address").title()
+    prezzo = request.form.get("prezzo")
+    if prezzo == "":
+        prezzo = None
+    else:
+        prezzo = int(prezzo)
+    cuisines = request.form.get("cuisines").title()
+    if cuisines == "":
+        cuisines = None
+    else:
+        cuisines = cuisines.split(",")
+        cuisines = list(map(str.strip, cuisines))
+    currency = request.form.get("currency").title()
+    if currency == "":
+        currency = None
+    table = request.form.get("table")
+    if(table == "Sì"):
+        table = True
+    else:
+        table = False
+    delivery = request.form.get("delivery")
+    if (delivery == "Sì"):
+        delivery = True
+    else:
+        delivery = False
+    voti = int(request.form.get("voti"))
+    punteggio = float(request.form.get("punteggio"))
+    range_prezzo = int(request.form.get("range_prezzo"))
+
+    new_restaurant = {"restaurant_id": max_id, "restaurant_name": nome, "city": city, "address": address,
+                      "locality": address, "cuisines": cuisines, "average_cost_for_two": prezzo,
+                      "currency": currency, "has_table_booking": table, "has_online_delivery": delivery,
+                      "price_range": range_prezzo, "aggregate_rating": punteggio, "votes": voti}
+
+    db.ristoranti.insert_one(new_restaurant)
+
+    flash("Ristorante inserito con successo!")
+
+    distinct_city, distinct_cuisines = update_distinct()
+
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+
+
+@app.route("/modify_restaurant", methods=['GET', 'POST'])
+def modify_restaurant():
+    _id = request.form.get("_id")
+    nome = request.form.get("nome")
+    city = request.form.get("city").title()
+    address = request.form.get("address").title()
+    prezzo = request.form.get("prezzo")
+    if prezzo == "":
+        prezzo = None
+    else:
+        prezzo = int(prezzo)
+    cuisines = request.form.get("cuisines").title()
+    if cuisines == "":
+        cuisines = None
+    else:
+        cuisines = cuisines.split(",")
+        cuisines = list(map(str.strip, cuisines))
+    currency = request.form.get("currency").title()
+    if currency == "":
+        currency = None
+    table = request.form.get("table")
+    if (table == "Sì"):
+        table = True
+    else:
+        table = False
+    delivery = request.form.get("delivery")
+    if (delivery == "Sì"):
+        delivery = True
+    else:
+        delivery = False
+    voti = int(request.form.get("voti"))
+    punteggio = float(request.form.get("punteggio"))
+    range_prezzo = int(request.form.get("range_prezzo"))
+
+    query = {"_id": ObjectId(_id)}
+    update_values={"$set": {"restaurant_name": nome, "city": city, "address": address,
+                      "locality": address, "cuisines": cuisines, "average_cost_for_two": prezzo, "currency": currency,
+                      "has_table_booking": table, "has_online_delivery": delivery, "price_range": range_prezzo, "aggregate_rating": punteggio, "votes": voti}}
+
+    db.ristoranti.update_one(query, update_values)
+
+    flash("Ristorante modificato con successo!")
+
+    distinct_city, distinct_cuisines = update_distinct()
+
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
