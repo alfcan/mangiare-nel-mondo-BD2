@@ -90,7 +90,7 @@
     Query 5
   </div>
   <div class="card-body">
-    <h5 class="card-title">Trova i ristoranti per città, punteggio minimo e che effettuano consegna online</h5>
+    <h5 class="card-title">Trova i ristoranti per città, punteggio minimo e che effettuano consegna online, in ordine decrescente di voti totali</h5>
       <form class="form-inline card-text" method="POST" action="{{ url_for('query5') }}">
         <div class="form-group">
           <div class="input-group">
@@ -159,7 +159,7 @@
     Query 8
   </div>
   <div class="card-body">
-    <h5 class="card-title">Trova i ristoranti per nome</h5>
+    <h5 class="card-title">Trova i ristoranti per nome, in ordine decrescente di voto medio</h5>
       <form class="form-inline card-text" method="POST" action="{{ url_for('query8') }}">
         <div class="form-group">
           <div class="input-group">
@@ -211,6 +211,38 @@
               <span class="input-group-addon">Seleziona la città</span>
                   <select name="city" class="selectpicker form-control">
                     {% for c in city %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                  </select>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra risultato</button>
+      </form>
+  </div>
+  {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for i in messages %}
+          <script>
+              alert("{{ i }}");
+          </script>
+          {% endfor %}
+      {% endif %}
+  {% endwith %}
+</div>
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 11
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova la somma dei voti per i ristoranti che utilizzano la valuta selezionata</h5>
+     <form class="form-inline card-text" method="POST" action="{{ url_for('query11') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona la valuta</span>
+                  <select name="currency" class="selectpicker form-control"o>
+                    {% for c in currencies %}
                     <option value="{{ c }}">{{ c }}</option>
                     {% endfor %}
                   </select>

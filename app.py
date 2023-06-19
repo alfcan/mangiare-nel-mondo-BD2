@@ -21,11 +21,12 @@ distinct_cuisines = None
 def update_distinct():
     distinct_city = restaurant_collection.distinct('city')
     distinct_cuisines = restaurant_collection.distinct('cuisines')
+    distinct_currencies = restaurant_collection.distinct('currency')
 
     if None in distinct_cuisines:
         distinct_cuisines.remove(None)
 
-    return distinct_city, distinct_cuisines
+    return distinct_city, distinct_cuisines, distinct_currencies
 
 @app.route('/cards')
 def cards():
@@ -37,9 +38,9 @@ def cards():
 
 @app.route('/')
 def index():
-    distinct_city, distinct_cuisines = update_distinct()
+    distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
 
-    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
 
 
 @app.route("/query1", methods=['GET', 'POST'])
@@ -88,7 +89,7 @@ def query5():
     city = request.form.get("city")
     punteggio = request.form.get("punteggio")
 
-    restaurants_from_query = db.ristoranti.find({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}]})
+    restaurants_from_query = db.ristoranti.find({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}]}).sort("votes",-1)
     result_count = db.ristoranti.count_documents({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}]})
 
     return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
@@ -119,7 +120,7 @@ def query7():
 @app.route("/query8", methods=['GET', 'POST'])
 def query8():
     nome = request.form.get("nome")
-    restaurants_from_query = db.ristoranti.find({"restaurant_name": {"$regex": nome, "$options": "i"}})
+    restaurants_from_query = db.ristoranti.find({"restaurant_name": {"$regex": nome, "$options": "i"}}).sort("aggregate_rating",-1)
     result_count = db.ristoranti.count_documents({"restaurant_name": {"$regex": nome, "$options": "i"}})
 
     return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
@@ -159,9 +160,25 @@ def query10():
 
     flash(f"Per la città: {city_popup}, il numero medio di voti è: {avg_voti_popup}")
 
-    distinct_city, distinct_cuisines = update_distinct()
+    distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
 
-    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
+
+@app.route("/query11", methods=['GET', 'POST'])
+def query11():
+    currency = request.form.get("currency")
+    pipeline = [{"$match": {"currency": currency}}, {"$group": {"_id": "$currency", "sum_voti": {"$sum": "$votes"}}}]
+
+    return_value = db.ristoranti.aggregate(pipeline)
+    tmp_value=return_value.next()
+    currency_popup = tmp_value["_id"]
+    sum_voti_popup = tmp_value["sum_voti"]
+
+    flash(f"Per i ristoranti che utilizzano la valuta: {currency_popup}, la somma dei voti è: {sum_voti_popup}")
+
+    distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
+
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
 
 
 @app.route("/modify", methods=['GET', 'POST'])
@@ -186,9 +203,9 @@ def delete():
 
     flash("Ristorante cancellato con successo!")
 
-    distinct_city, distinct_cuisines = update_distinct()
+    distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
 
-    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
 
 
 @app.route("/insert")
@@ -243,9 +260,9 @@ def add_restaurant():
 
     flash("Ristorante inserito con successo!")
 
-    distinct_city, distinct_cuisines = update_distinct()
+    distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
 
-    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
 
 
 @app.route("/modify_restaurant", methods=['GET', 'POST'])
@@ -291,9 +308,9 @@ def modify_restaurant():
 
     flash("Ristorante modificato con successo!")
 
-    distinct_city, distinct_cuisines = update_distinct()
+    distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
 
-    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines)
+    return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
 
 
 if __name__ == '__main__':

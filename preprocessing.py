@@ -1,6 +1,9 @@
+import json
+
 import pandas as pd
 import chardet
 from forex_python.converter import CurrencyRates
+from pymongo import MongoClient
 
 
 def delete_cols(df, cols):
@@ -52,3 +55,15 @@ if __name__ == '__main__':
 
     print(df.columns)
     print(df.dtypes.to_dict())
+
+    DB_URI = "mongodb://localhost:27017/"
+
+    client = MongoClient(DB_URI)
+
+    db = client["progettoBD2"]
+
+    db_collection = db["ristoranti"]
+
+    json_file = open("data.json")
+
+    db_collection.insert_many(json.load(json_file))
