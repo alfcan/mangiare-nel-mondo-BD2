@@ -1,5 +1,3 @@
-import json
-
 from flask import Flask, render_template, request, flash, url_for
 from bson.objectid import ObjectId
 from pymongo import MongoClient
@@ -18,7 +16,7 @@ distinct_city = None
 distinct_cuisines = None
 distinct_currencies = None
 
-restaurant_collection.create_index("restaurant_name")
+restaurant_collection.create_index([("restaurant_name", "text")])
 def update_distinct():
     distinct_city = restaurant_collection.distinct('city')
     distinct_cuisines = restaurant_collection.distinct('cuisines')

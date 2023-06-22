@@ -2,7 +2,6 @@ import json
 
 import pandas as pd
 import chardet
-from forex_python.converter import CurrencyRates
 from pymongo import MongoClient
 
 
