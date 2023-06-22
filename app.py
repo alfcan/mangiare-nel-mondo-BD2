@@ -16,8 +16,9 @@ app.secret_key = 'secret_key'
 restaurant_collection = db.ristoranti
 distinct_city = None
 distinct_cuisines = None
+distinct_currencies = None
 
-
+restaurant_collection.create_index("restaurant_name")
 def update_distinct():
     distinct_city = restaurant_collection.distinct('city')
     distinct_cuisines = restaurant_collection.distinct('cuisines')
@@ -78,7 +79,7 @@ def query4():
     for i in range(len(cuisine)):
         query.append({"cuisines": cuisine[i]})
 
-    restaurants_from_query = db.ristoranti.find({"$and": query})
+    restaurants_from_query = db.ristoranti.find({"$and": query}).sort([("aggregate_rating", -1), ("votes",-1)])
     result_count = db.ristoranti.count_documents({"$and": query})
 
     return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
@@ -89,8 +90,8 @@ def query5():
     city = request.form.get("city")
     punteggio = request.form.get("punteggio")
 
-    restaurants_from_query = db.ristoranti.find({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}]}).sort("votes",-1)
-    result_count = db.ristoranti.count_documents({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}]})
+    restaurants_from_query = db.ristoranti.find({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}, {"price_range": {"$ne": 1}}]}).sort("votes",-1)
+    result_count = db.ristoranti.count_documents({"$and": [{"city": city}, {"aggregate_rating": {"$gte": float(punteggio)}}, {"has_online_delivery": True}, {"price_range": {"$ne": 1}}]})
 
     return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
 
@@ -100,7 +101,7 @@ def query6():
     city = request.form.get("city")
     prezzo = request.form.get("prezzo")
 
-    restaurants_from_query = db.ristoranti.find({"$and": [{"city": city}, {"average_cost_for_two": {"$gt": 0, "$lte": float(prezzo)}}, {"has_table_booking": True}]})
+    restaurants_from_query = db.ristoranti.find({"$and": [{"city": city}, {"average_cost_for_two": {"$gt": 0, "$lte": float(prezzo)}}, {"has_table_booking": True}]}).sort("restaurant_name",1)
     result_count = db.ristoranti.count_documents({"$and": [{"city": city}, {"average_cost_for_two": {"$gt": 0, "$lte": float(prezzo)}}, {"has_table_booking": True}]})
 
     return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
@@ -179,6 +180,22 @@ def query11():
     distinct_city, distinct_cuisines, distinct_currencies = update_distinct()
 
     return render_template('index.html', city=distinct_city, cuisines=distinct_cuisines, currencies=distinct_currencies)
+
+@app.route("/query12", methods=['GET', 'POST'])
+def query12():
+    nome = request.form.get("nome")
+    restaurants_from_query = db.ristoranti.find({"$text": {"$search": nome}}).sort("aggregate_rating", -1)
+    result_count = db.ristoranti.count_documents({"$text": {"$search": nome}})
+
+    return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
+
+@app.route("/query13", methods=['GET', 'POST'])
+def query13():
+    range = request.form.get("range_prezzo")
+    restaurants_from_query = db.ristoranti.find({"$and": [{"price_range": int(range)}, {"$or": [{"has_online_delivery": True}, {"has_table_booking": True}]}]}).sort("votes",-1)
+    result_count = db.ristoranti.count_documents({"$and": [{"price_range": int(range)}, {"$or": [{"has_online_delivery": True}, {"has_table_booking": True}]}]})
+
+    return render_template("card.html", restaurants=restaurants_from_query, result_count=result_count)
 
 
 @app.route("/modify", methods=['GET', 'POST'])

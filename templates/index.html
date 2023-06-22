@@ -66,7 +66,7 @@
     Query 4
   </div>
   <div class="card-body">
-    <h5 class="card-title">Trova i ristoranti per tipi di cucina</h5>
+    <h5 class="card-title">Trova i ristoranti per tipi di cucina, in ordine decrescente di voto medio e voti totali</h5>
       <form class="form-inline card-text" method="POST" action="{{ url_for('query4') }}">
         <div class="form-group">
           <div class="input-group">
@@ -90,7 +90,7 @@
     Query 5
   </div>
   <div class="card-body">
-    <h5 class="card-title">Trova i ristoranti per città, punteggio minimo e che effettuano consegna online, in ordine decrescente di voti totali</h5>
+    <h5 class="card-title">Trova i ristoranti per città, punteggio minimo e che effettuano consegna online aventi un range di prezzo diverso da 1, in ordine decrescente di voti totali</h5>
       <form class="form-inline card-text" method="POST" action="{{ url_for('query5') }}">
         <div class="form-group">
           <div class="input-group">
@@ -114,7 +114,7 @@
     Query 6
   </div>
   <div class="card-body">
-    <h5 class="card-title">Trova i ristoranti per città, prezzo medio per due persone massimo e con prenotazione al tavolo</h5>
+    <h5 class="card-title">Trova i ristoranti per città, prezzo medio per due persone massimo e con prenotazione al tavolo, ordinati per nome</h5>
       <form class="form-inline card-text" method="POST" action="{{ url_for('query6') }}">
         <div class="form-group">
           <div class="input-group">
@@ -246,6 +246,62 @@
                     <option value="{{ c }}">{{ c }}</option>
                     {% endfor %}
                   </select>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra risultato</button>
+      </form>
+  </div>
+  {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for i in messages %}
+          <script>
+              alert("{{ i }}");
+          </script>
+          {% endfor %}
+      {% endif %}
+  {% endwith %}
+</div>
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 12
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova ristoranti specificando delle parole chiave, in ordine decrescente di voto medio</h5>
+     <form class="form-inline card-text" method="POST" action="{{ url_for('query12') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Inserisci il nome</span>
+                  <input type="text" name="nome"/>
+          </div>
+        </div>
+          <button type="submit" class="btn btn-primary">Mostra risultato</button>
+      </form>
+  </div>
+  {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          {% for i in messages %}
+          <script>
+              alert("{{ i }}");
+          </script>
+          {% endfor %}
+      {% endif %}
+  {% endwith %}
+</div>
+
+
+<div class="card text-center">
+  <div class="card-header">
+    Query 13
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Trova ristoranti per un dato price range aventi prenotazione al tavolo o consegna online, in ordine decrescente di voti totali</h5>
+     <form class="form-inline card-text" method="POST" action="{{ url_for('query13') }}">
+        <div class="form-group">
+          <div class="input-group">
+              <span class="input-group-addon">Seleziona il range di prezzo</span>
+                  <input type="number" name="range_prezzo" min="1" max="4" pattern="^\d(\.\d)?$" required>
           </div>
         </div>
           <button type="submit" class="btn btn-primary">Mostra risultato</button>
